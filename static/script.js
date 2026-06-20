@@ -111,4 +111,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial load
     fetchNotes();
+
+    // --- Custom Cursor & Sparkles ---
+    const cursor = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    document.body.appendChild(cursor);
+
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+
+        if (Math.random() > 0.3) {
+            createSparkle(e.clientX, e.clientY);
+        }
+    });
+
+    const createSparkle = (x, y) => {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = x + 'px';
+        sparkle.style.top = y + 'px';
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 20 + 10;
+        sparkle.style.setProperty('--dx', (Math.cos(angle) * distance) + 'px');
+        sparkle.style.setProperty('--dy', (Math.sin(angle) * distance) + 'px');
+        
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 600);
+    };
+
+    const attachCursorHover = () => {
+        document.querySelectorAll('button, a, .read-more, .tweet-btn, .note-card').forEach(el => {
+            if (!el.dataset.hasHover) {
+                el.dataset.hasHover = 'true';
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+            }
+        });
+    };
+
+    const observer = new MutationObserver(() => attachCursorHover());
+    observer.observe(document.body, { childList: true, subtree: true });
+    attachCursorHover();
 });
